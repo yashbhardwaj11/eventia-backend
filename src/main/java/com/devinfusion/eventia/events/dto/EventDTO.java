@@ -20,4 +20,6 @@ public class EventDTO {
     private Integer totalSeats;
     private Integer availableSeats;
     private String organizerUid;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

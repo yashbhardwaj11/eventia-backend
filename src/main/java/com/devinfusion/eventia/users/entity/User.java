@@ -1,5 +1,8 @@
 package com.devinfusion.eventia.users.entity;
 
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,4 +30,10 @@ public class User {
     private String phoneNumber;
     private String profilePictureUrl;
     private boolean active = true;
+
+    @CreationTimestamp
+    LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    LocalDateTime updatedAt;
 }

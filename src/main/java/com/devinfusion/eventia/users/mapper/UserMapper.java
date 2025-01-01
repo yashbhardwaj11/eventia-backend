@@ -16,7 +16,9 @@ public class UserMapper {
             user.getPhoneNumber(),
             user.getProfilePictureUrl(),
             user.isActive(),
-            user.getRole()
+            user.getRole(),
+            user.getCreatedAt(),
+            user.getUpdatedAt()
         );
     }
 

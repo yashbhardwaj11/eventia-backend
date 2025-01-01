@@ -19,7 +19,9 @@ public class EventMapper {
             event.getPrice(),
             event.getTotalSeats(),
             event.getAvailableSeats(),
-            event.getOrganizer() != null ? event.getOrganizer().getUid() : null
+            event.getOrganizer() != null ? event.getOrganizer().getUid() : null,
+            event.getCreatedAt(),
+            event.getUpdatedAt()
         );
     }
 
