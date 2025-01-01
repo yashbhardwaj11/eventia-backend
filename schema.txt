@@ -1,0 +1,225 @@
+User Entity Enhancements
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "eventia_user")
+public class User {
+
+    @Id
+    String uid;
+    
+    @NotNull
+    String name;
+    
+    @NotNull
+    @Email
+    String email;
+    
+    @NotNull
+    String password;
+    
+    @Enumerated(EnumType.STRING)
+    private Role role; // To handle user roles (e.g., ADMIN, CUSTOMER)
+
+    private String phoneNumber; // Optional phone number field
+    
+    private String profilePictureUrl; // Optional URL for the profile picture
+    
+    private boolean active = true; // To track if the user is active or deactivated
+    
+    // Additional fields like address or payment details can be added
+}
+Roles can be an Enum:
+
+public enum Role {
+    ADMIN,
+    CUSTOMER
+}
+
+//Events
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "events")
+public class Event {
+
+    @Id
+    String eventId;
+    
+    @NotNull
+    String name;
+    
+    @NotNull
+    String description;
+    
+    @NotNull
+    LocalDateTime eventDate; // Date and time of the event
+    
+    @NotNull
+    String venue;
+    
+    @NotNull
+    double price; // Price per ticket
+    
+    @NotNull
+    int totalSeats; // Total seats available for the event
+    
+    int availableSeats; // Seats available after bookings
+    
+    @ManyToOne
+    @JoinColumn(name = "organizer_id", referencedColumnName = "uid")
+    private User organizer; // The user organizing the event
+    
+    // Optional: You can have additional fields for event categories, images, etc.
+}
+
+//Ticket Entity : The Ticket entity represents a ticket for an event. It contains information like the user who booked it, the event, the price paid, and the ticket status (booked, cancelled, etc.).
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "tickets")
+public class Ticket {
+
+    @Id
+    String ticketId;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "uid")
+    private User user; // User who booked the ticket
+    
+    @ManyToOne
+    @JoinColumn(name = "event_id", referencedColumnName = "eventId")
+    private Event event; // The event for which the ticket was booked
+    
+    @NotNull
+    double price; // Price paid for the ticket
+    
+    @Enumerated(EnumType.STRING)
+    private TicketStatus status; // Status like "BOOKED", "CANCELLED", "PENDING"
+    
+    @NotNull
+    LocalDateTime bookingTime; // Time when the ticket was booked
+
+    LocalDateTime cancellationTime; // Time when the ticket was cancelled (if applicable)
+}
+
+public enum TicketStatus {
+    BOOKED,
+    CANCELLED,
+    PENDING
+}
+
+//Booking : If you want to track bookings separately from tickets (e.g., users can book multiple tickets at once), you could create a Booking entity that tracks the overall booking
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "bookings")
+public class Booking {
+
+    @Id
+    String bookingId;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "uid")
+    private User user; // User who made the booking
+    
+    @ManyToOne
+    @JoinColumn(name = "event_id", referencedColumnName = "eventId")
+    private Event event; // Event that is being booked
+    
+    @NotNull
+    LocalDateTime bookingDate; // Date and time when the booking was made
+    
+    @NotNull
+    int numberOfTickets; // Number of tickets booked
+    
+    double totalAmount; // Total cost for the number of tickets booked
+    
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status; // Booking status (e.g., PENDING, CONFIRMED)
+}
+
+public enum BookingStatus {
+    PENDING,
+    CONFIRMED,
+    CANCELLED
+}
+
+
+// Payment Entity : If you plan to handle payments for the event tickets, you will need a Payment entity. This can store payment details, transaction IDs, and other necessary info.
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "payments")
+public class Payment {
+
+    @Id
+    String paymentId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "uid")
+    private User user; // User who made the payment
+
+    @ManyToOne
+    @JoinColumn(name = "booking_id", referencedColumnName = "bookingId")
+    private Booking booking; // Booking that the payment was made for
+
+    @NotNull
+    double amount; // Amount paid
+    
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status; // Payment status (e.g., SUCCESS, FAILURE)
+    
+    @NotNull
+    LocalDateTime paymentDate; // Date and time when the payment was made
+}
+
+public enum PaymentStatus {
+    SUCCESS,
+    FAILURE,
+    PENDING
+}
+
+//Event Category Entity : If you want to categorize events (e.g., concerts, sports, theatre), you can create an EventCategory entity.
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "event_categories")
+public class EventCategory {
+
+    @Id
+    String categoryId;
+    
+    @NotNull
+    String name; // Name of the category (e.g., Concert, Sports, Theatre)
+    
+    @OneToMany(mappedBy = "category")
+    private List<Event> events; // List of events in this category
+}
+
+
+// Optional Enhancements
+
+    User Reviews/Feedback: If users can rate or review events or tickets, you can create a Review entity.
+    Event Images: To store images for events, you might want to add a field for event image URLs or an EventImage entity.
+    Notifications: Create a Notification entity for sending users updates about event status, booking status, etc.
+
+
+//Final Schema Overview
+
+Here's a quick overview of the entities in your system:
+
+    User: Contains user details (UID, name, email, password, etc.).
+    Event: Contains event details (name, date, venue, price, etc.).
+    Ticket: Represents a booked ticket for an event.
+    Booking: Tracks bookings made by users for specific events.
+    Payment: Tracks payments for bookings.
+    EventCategory: Categorizes events (optional).
+    Review: Allows users to review events (optional).
+
